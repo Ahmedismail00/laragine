@@ -3,9 +3,15 @@
 namespace Core\#MODULE_NAME#\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Core\Base\Traits\Response\SendResponse;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Contracts\Validation\Validator;
+
 
 class #UNIT_NAME#Request extends FormRequest
 {
+    use SendResponse;
+
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -39,5 +45,15 @@ class #UNIT_NAME#Request extends FormRequest
                 ];
             }
         }
+    }
+
+    public function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException($this->sendResponse(
+            $validator->errors()->toArray(),
+            __('Invalid details'),
+            true,
+            422
+        ));
     }
 }
